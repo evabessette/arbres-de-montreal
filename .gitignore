@@ -26,4 +26,6 @@ dist-ssr
 # Fichier CSV
 /public/data/arbres-publics.csv
 
-/docs/
+/docs/*
+
+!/docs/screenshots/

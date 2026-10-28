@@ -2,9 +2,27 @@
 
 Application de bureau pour explorer un échantillon d’arbres publics de Montréal et gérer une collection avec persistance. Elle permet de repérer les essences, consulter les coordonnées et comparer les diamètres.
 
+## Captures d'écran
+
+### Tableau de bord
+
+![Tableau de bord](docs/screenshots/accueil.png)
+
+### Carte
+
+![Carte](docs/screenshots/carte.png)
+
+### Mes Favoris
+
+![Favoris](docs/screenshots/favoris.png)
+
+### Ajouter un arbre
+
+![Ajouter un arbre](docs/screenshots/ajouter_arbre.png)
+
 ## Équipe et dépôt
 
-- Eva Bessette : recherche en Rust, commande obtenir_statistiques, délai avant la recherche, suggestions plus rapides, vérifications avant la remise (formatage Rust, compilation, build), mise à jour du README (note: certains de mes commits ne sont pas liés à mon compte Github à cause d'une erreur de configuration Git).
+- Eva Bessette : recherche en Rust, anti-rebond (debounce) de la recherche, optimisation de la recherche, branchement des statistiques Rust au service Vue, vérifications avant la remise (formatage Rust, compilation, build), mise à jour du README.
 - Marc-André Dufour : backend Tauri, commands.rs, persistance JSON, favoris, observations, gestion des erreurs, pages Vue (formulaire, tableau de bord, liste des arbres, favoris).
 - Charles Legault : carte; import CSV; rechercher, filtrer, trier, et suggestions en Javascript; fichiers models.rs, validation.rs, statistiques.rs; amélioration des pages Vue (formulaire, tableau de bord, liste des arbres, favoris).
 - Dépôt du cours : https://github.com/E26-DA1B/projet_eva_marc-andre_charles
