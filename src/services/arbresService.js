@@ -1,4 +1,4 @@
-import { reactive, readonly } from "vue";
+import { reactive, readonly, toRaw } from "vue";
 import { chargerArbres } from "./donneesArbres.js";
 import { invoke } from "@tauri-apps/api/core";
 import { rechercherParEspece } from "./rechercheArbres.js";
@@ -220,7 +220,8 @@ export function creerServiceArbres(charger = chargerArbres) {
     });
 
     const ids = new Set(resultats);
-    return arbres.filter((arbre) => ids.has(String(arbre.id)));
+    const filter = toRaw(arbres).filter((arbre) => ids.has(String(arbre.id)));
+    return filter;
   }
   async function obtenirStatistiques() {
     if (!tauriActif()) {
