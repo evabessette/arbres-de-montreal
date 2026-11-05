@@ -83,12 +83,13 @@ pub fn sauvegarder_arbres(path: &Path, arbres: &[Arbre]) -> Result<(), String> {
     fs::write(path, contenu).map_err(|e| e.to_string())
 }
 
-pub fn importer(path: &Path, arbres: &[Arbre]) -> Result<(), String> {
-    sauvegarder_arbres(path, arbres)
+pub fn importer(path: &Path, nouveaux: Vec<Arbre>, arbres: &mut Vec<Arbre>) -> Result<(), String> {
+    sauvegarder_arbres(path, &nouveaux)?;
+    *arbres = nouveaux;
+    Ok(())
 }
 
-pub fn ajouter(path: &Path, mut arbre: Arbre) -> Result<Arbre, String> {
-    let mut arbres = charger_arbres(path)?;
+pub fn ajouter(path: &Path, mut arbre: Arbre, arbres: &mut Vec<Arbre>) -> Result<Arbre, String> {
     let prochain_id = arbres
         .iter()
         .filter_map(|a| a.id().parse::<u64>().ok())
@@ -109,14 +110,21 @@ pub fn ajouter(path: &Path, mut arbre: Arbre) -> Result<Arbre, String> {
         arbre.arbre_remarquable().map(str::to_string),
     );
     arbres.push(arbre.clone());
-    sauvegarder_arbres(path, &arbres)?;
+    if let Err(e) = sauvegarder_arbres(path, arbres) {
+        arbres.pop();
+        return Err(e);
+    }
     Ok(arbre)
 }
 
-pub fn modifier(path: &Path, id: &str, arbre_modifie: Arbre) -> Result<Arbre, String> {
-    let mut arbres = charger_arbres(path)?;
+pub fn modifier(
+    path: &Path,
+    id: &str,
+    arbre_modifie: Arbre,
+    arbres: &mut Vec<Arbre>,
+) -> Result<Arbre, String> {
     let position = arbres
-        .iter_mut()
+        .iter()
         .position(|a| a.id() == id)
         .ok_or("Arbre introuvable.")?;
     let arbre = Arbre::new(
@@ -132,17 +140,23 @@ pub fn modifier(path: &Path, id: &str, arbre_modifie: Arbre) -> Result<Arbre, St
         arbre_modifie.date_plantation().map(str::to_string),
         arbre_modifie.arbre_remarquable().map(str::to_string),
     );
-    arbres[position] = arbre.clone();
-    sauvegarder_arbres(path, &arbres)?;
+    let ancien = std::mem::replace(&mut arbres[position], arbre.clone());
+    if let Err(e) = sauvegarder_arbres(path, arbres) {
+        arbres[position] = ancien;
+        return Err(e);
+    }
     Ok(arbre)
 }
 
-pub fn supprimer(path: &Path, id: &str) -> Result<(), String> {
-    let mut arbres = charger_arbres(path)?;
-    let taille_avant = arbres.len();
-    arbres.retain(|arbre| arbre.id() != id);
-    if arbres.len() == taille_avant {
-        return Err("Arbre introuvable.".to_string());
+pub fn supprimer(path: &Path, id: &str, arbres: &mut Vec<Arbre>) -> Result<(), String> {
+    let position = arbres
+        .iter()
+        .position(|arbre| arbre.id() == id)
+        .ok_or("Arbre introuvable.")?;
+    let retire = arbres.remove(position);
+    if let Err(e) = sauvegarder_arbres(path, arbres) {
+        arbres.insert(position, retire);
+        return Err(e);
     }
-    sauvegarder_arbres(path, &arbres)
+    Ok(())
 }

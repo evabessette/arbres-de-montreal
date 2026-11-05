@@ -19,7 +19,9 @@ pub fn run() {
                 chemin: dossier.join("arbres.json"),
                 chemin_favoris: dossier.join("favoris.json"),
                 chemin_observations: dossier.join("observations.json"),
-                verrou: std::sync::Mutex::new(()),
+                verrou: std::sync::Mutex::new(repository::charger_arbres(
+                    &dossier.join("arbres.json"),
+                )?),
             });
             Ok(())
         })
