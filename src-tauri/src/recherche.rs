@@ -1,4 +1,5 @@
 use crate::models::Arbre;
+use std::collections::HashMap;
 use unicode_normalization::UnicodeNormalization;
 
 fn normaliser(texte: &str) -> String {
@@ -16,12 +17,15 @@ pub(crate) fn rechercher_par_espece<'a>(arbres: &'a [Arbre], recherche: &str) ->
         return arbres.iter().collect();
     }
 
+    // Beaucoup d'arbres partagent la même espèce : chaque nom n'est normalisé qu'une fois.
+    let mut especes_vues: HashMap<&str, bool> = HashMap::new();
+
     arbres
         .iter()
         .filter(|arbre| {
-            let espece = normaliser(arbre.essence_fr());
-
-            espece.contains(texte_recherche.as_str())
+            *especes_vues
+                .entry(arbre.essence_fr())
+                .or_insert_with(|| normaliser(arbre.essence_fr()).contains(&texte_recherche))
         })
         .collect()
 }
